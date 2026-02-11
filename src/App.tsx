@@ -119,9 +119,33 @@ function* mergeSort(left: number, right: number): Generator {
   }
 }
 
+function isSorted(array: number[]) {
+  for (let i = 1; i < array.length; i++) {
+    if (!(array[i - 1] > array[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function* bozoSort() {
+  for (;;) {
+    if (isSorted(arr)) {
+      break;
+    }
+    const i = Math.floor(Math.random() * arr.length);
+    const j = Math.floor(Math.random() * arr.length);
+    if (i !== j) {
+      yield* swap(i, j);
+    }
+  }
+}
+
 const subscribe = (onChange: () => void) => {
   const gen = (() => {
     switch (new URLSearchParams(location.search).get("algorithm")) {
+      case "bozo":
+        return bozoSort();
       case "stooge":
         return stoogeSort(0, arr.length - 1);
       case "bubble":
