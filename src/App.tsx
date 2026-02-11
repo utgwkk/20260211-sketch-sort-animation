@@ -9,13 +9,17 @@ const N = (() => {
 })();
 let arr = arrayToShuffled(new Array(N).fill(0).map((_, i) => i));
 
+function* swap(i: number, j: number) {
+  [arr[i], arr[j]] = [arr[j], arr[i]];
+  arr = arr.slice(); // for useSyncExternalStore
+  yield;
+}
+
 function* bubbleSort() {
   for (let i = 0; i < arr.length; i++) {
     for (let j = 0; j < arr.length; j++) {
       if (arr[j] < arr[j + 1]) {
-        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-        arr = arr.slice();
-        yield;
+        yield* swap(j, j + 1);
       }
     }
   }
@@ -27,9 +31,7 @@ function* insertionSort() {
       let j = i;
       const tmp = arr[i];
       do {
-        [arr[j], arr[j - 1]] = [arr[j - 1], arr[j]];
-        arr = arr.slice();
-        yield;
+        yield* swap(j, j - 1);
         j--;
       } while (j > 0 && arr[j - 1] < tmp);
       arr[j] = tmp;
@@ -71,9 +73,7 @@ function* mergeSort(left: number, right: number): Generator {
   }
   for (let i = 0; i < newArrPart.length; i++) {
     const swapIdx = arr.findIndex((x) => x === newArrPart[i]);
-    [arr[left + i], arr[swapIdx]] = [newArrPart[i], arr[left + i]];
-    arr = arr.slice();
-    yield;
+    yield* swap(left + i, swapIdx);
   }
 }
 
