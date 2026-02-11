@@ -90,10 +90,13 @@ const subscribe = (onChange: () => void) => {
         return bubbleSort();
     }
   })();
+  let swapCount = 0;
   const timer = window.setInterval(() => {
+    swapCount++;
     const { done } = gen.next();
     onChange();
     if (done) {
+      console.log(`finished with ${swapCount} swaps`);
       window.clearInterval(timer);
     }
   }, 1000 / 120);
