@@ -1,34 +1,58 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { useSyncExternalStore } from "react";
 import "./App.css";
+import { arrayToShuffled } from "array-shuffle";
+
+let arr = (() => arrayToShuffled(new Array(160).fill(0).map((_, i) => i)))();
+
+function* bubbleSort() {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 0; j < arr.length; j++) {
+      if (arr[j] < arr[j + 1]) {
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+        arr = arr.slice();
+        yield;
+      }
+    }
+  }
+}
+
+const subscribe = (onChange: () => void) => {
+  const gen = bubbleSort();
+  const timer = window.setInterval(() => {
+    const { done } = gen.next();
+    onChange();
+    if (done) {
+      window.clearInterval(timer);
+    }
+  }, 1000 / 120);
+  return () => window.clearInterval(timer);
+};
+
+const getSnapshot = () => arr;
 
 function App() {
-  const [count, setCount] = useState(0);
-
+  const values = useSyncExternalStore(subscribe, getSnapshot);
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "row",
+      }}
+    >
+      {values.map((v) => (
+        <div
+          key={v}
+          style={{
+            width: `${100 / arr.length}%`,
+            height: `${(100 * (v + 1)) / arr.length}%`,
+            backgroundColor: "black",
+            // backgroundColor: `hsl(${(720 * (v + 1)) / arr.length} 100% 50%)`,
+          }}
+        ></div>
+      ))}
+    </div>
   );
 }
 
