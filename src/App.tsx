@@ -68,6 +68,19 @@ function* insertionSort() {
   }
 }
 
+function* stoogeSort(left: number, right: number): Generator {
+  if (arr[right] > arr[left]) {
+    yield* swap(left, right);
+  }
+
+  if (right - left + 1 >= 3) {
+    const t = Math.floor((right - left + 1) / 3);
+    yield* stoogeSort(left, right - t);
+    yield* stoogeSort(left + t, right);
+    yield* stoogeSort(left, right - t);
+  }
+}
+
 function* mergeSort(left: number, right: number): Generator {
   const middle = (left + right) >> 1;
   if (left === right || left === right - 1) {
@@ -109,6 +122,8 @@ function* mergeSort(left: number, right: number): Generator {
 const subscribe = (onChange: () => void) => {
   const gen = (() => {
     switch (new URLSearchParams(location.search).get("algorithm")) {
+      case "stooge":
+        return stoogeSort(0, arr.length - 1);
       case "bubble":
         return bubbleSort();
       case "shaker":
