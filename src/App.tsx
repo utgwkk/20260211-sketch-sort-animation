@@ -16,8 +16,33 @@ function* bubbleSort() {
   }
 }
 
+function* insertionSort() {
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i - 1] < arr[i]) {
+      let j = i;
+      const tmp = arr[i];
+      do {
+        [arr[j], arr[j - 1]] = [arr[j - 1], arr[j]];
+        arr = arr.slice();
+        yield;
+        j--;
+      } while (j > 0 && arr[j - 1] < tmp);
+      arr[j] = tmp;
+    }
+  }
+}
+
 const subscribe = (onChange: () => void) => {
-  const gen = bubbleSort();
+  const gen = (() => {
+    switch (new URLSearchParams(location.search).get("algorithm")) {
+      case "bubble":
+        return bubbleSort();
+      case "insertion":
+        return insertionSort();
+      default:
+        return bubbleSort();
+    }
+  })();
   const timer = window.setInterval(() => {
     const { done } = gen.next();
     onChange();
