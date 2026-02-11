@@ -5,7 +5,7 @@ import { arrayToShuffled } from "array-shuffle";
 const DEFAULT_N = 200;
 const N = (() => {
   const n = Number(new URLSearchParams(location.search).get("n") ?? DEFAULT_N);
-  return Number.isNaN(n) ? DEFAULT_N : n;
+  return !Number.isNaN(n) && n > 0 ? n : DEFAULT_N;
 })();
 let arr = arrayToShuffled(new Array(N).fill(0).map((_, i) => i));
 
