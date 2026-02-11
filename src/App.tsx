@@ -32,6 +32,45 @@ function* insertionSort() {
   }
 }
 
+function* mergeSort(left: number, right: number): Generator {
+  const middle = (left + right) >> 1;
+  if (left === right || left === right - 1) {
+    return;
+  }
+  yield* mergeSort(left, middle);
+  yield* mergeSort(middle, right);
+
+  // merge
+  const newArrPart: number[] = [];
+  let leftIdx = left,
+    rightIdx = middle;
+  while (leftIdx < middle && rightIdx < right) {
+    if (arr[leftIdx] > arr[rightIdx]) {
+      newArrPart.push(arr[leftIdx]);
+      leftIdx++;
+    } else {
+      newArrPart.push(arr[rightIdx]);
+      rightIdx++;
+    }
+  }
+  if (left === middle) {
+    while (rightIdx < right) {
+      newArrPart.push(arr[rightIdx]);
+      rightIdx++;
+    }
+  } else {
+    while (leftIdx < middle) {
+      newArrPart.push(arr[leftIdx]);
+      leftIdx++;
+    }
+  }
+  for (let i = 0; i < newArrPart.length; i++) {
+    arr[left + i] = newArrPart[i];
+    arr = arr.slice();
+    yield;
+  }
+}
+
 const subscribe = (onChange: () => void) => {
   const gen = (() => {
     switch (new URLSearchParams(location.search).get("algorithm")) {
@@ -39,6 +78,8 @@ const subscribe = (onChange: () => void) => {
         return bubbleSort();
       case "insertion":
         return insertionSort();
+      case "merge":
+        return mergeSort(0, arr.length);
       default:
         return bubbleSort();
     }
