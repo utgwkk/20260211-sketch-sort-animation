@@ -70,7 +70,8 @@ function* mergeSort(left: number, right: number): Generator {
     }
   }
   for (let i = 0; i < newArrPart.length; i++) {
-    arr[left + i] = newArrPart[i];
+    const swapIdx = arr.findIndex((x) => x === newArrPart[i]);
+    [arr[left + i], arr[swapIdx]] = [newArrPart[i], arr[left + i]];
     arr = arr.slice();
     yield;
   }
