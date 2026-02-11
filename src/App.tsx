@@ -25,6 +25,35 @@ function* bubbleSort() {
   }
 }
 
+function* shakerSort() {
+  let top = 0,
+    bottom = arr.length - 1;
+  for (;;) {
+    let lastSwapIdx = top;
+    for (let i = top; i < bottom; i++) {
+      if (arr[i] < arr[i + 1]) {
+        yield* swap(i, i + 1);
+        lastSwapIdx = i;
+      }
+    }
+    bottom = lastSwapIdx;
+    if (top === bottom) {
+      break;
+    }
+    lastSwapIdx = bottom;
+    for (let i = bottom; i > top; i--) {
+      if (arr[i] > arr[i - 1]) {
+        yield* swap(i, i - 1);
+        lastSwapIdx = i;
+      }
+    }
+    top = lastSwapIdx;
+    if (top === bottom) {
+      break;
+    }
+  }
+}
+
 function* insertionSort() {
   for (let i = 1; i < arr.length; i++) {
     if (arr[i - 1] < arr[i]) {
@@ -82,6 +111,8 @@ const subscribe = (onChange: () => void) => {
     switch (new URLSearchParams(location.search).get("algorithm")) {
       case "bubble":
         return bubbleSort();
+      case "shaker":
+        return shakerSort();
       case "insertion":
         return insertionSort();
       case "merge":
