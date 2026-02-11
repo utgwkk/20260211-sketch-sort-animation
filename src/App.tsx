@@ -2,7 +2,12 @@ import { useSyncExternalStore } from "react";
 import "./App.css";
 import { arrayToShuffled } from "array-shuffle";
 
-let arr = (() => arrayToShuffled(new Array(160).fill(0).map((_, i) => i)))();
+const DEFAULT_N = 200;
+const N = (() => {
+  const n = Number(new URLSearchParams(location.search).get("n") ?? DEFAULT_N);
+  return Number.isNaN(n) ? DEFAULT_N : n;
+})();
+let arr = arrayToShuffled(new Array(N).fill(0).map((_, i) => i));
 
 function* bubbleSort() {
   for (let i = 0; i < arr.length; i++) {
@@ -96,27 +101,25 @@ const subscribe = (onChange: () => void) => {
 
 const getSnapshot = () => arr;
 
+function Bar({ value }: { value: number }) {
+  return (
+    <div
+      key={value}
+      style={{
+        width: `${100 / arr.length}%`,
+        height: `${(100 * (value + 1)) / arr.length}%`,
+        backgroundColor: "black",
+      }}
+    ></div>
+  );
+}
+
 function App() {
   const values = useSyncExternalStore(subscribe, getSnapshot);
   return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        flexDirection: "row",
-      }}
-    >
+    <div className="container">
       {values.map((v) => (
-        <div
-          key={v}
-          style={{
-            width: `${100 / arr.length}%`,
-            height: `${(100 * (v + 1)) / arr.length}%`,
-            backgroundColor: "black",
-            // backgroundColor: `hsl(${(720 * (v + 1)) / arr.length} 100% 50%)`,
-          }}
-        ></div>
+        <Bar key={v} value={v} />
       ))}
     </div>
   );
